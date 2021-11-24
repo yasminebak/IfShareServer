@@ -3,11 +3,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Product extends UnicastRemoteObject implements IProduct{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7822263390327070559L;
-
 	protected Product() throws RemoteException {
 		
 	}
@@ -16,24 +11,39 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	private String type;
 	private String nameProduct;
 	private float price;
-	private String statProduct=" ";
+	private String stateProduct=" ";
 	private float noteProduct;
 	private boolean available;
-	private int stock;
+	//private int stock;
 	
-	public Product(String id, String type, String nameProduct, float price) throws RemoteException {
+	public Product(String id, String type, String nameProduct, float price, boolean availible) throws RemoteException {
 		super();
 		this.id = id;
 		this.type = type;
 		this.nameProduct = nameProduct;
 		this.price = price;
-		this.available = false;
-		
-		
-		
+		this.available = availible;
 		
 		if (price < 0) {
 			throw new IllegalArgumentException("Price can't be negative !");
+		}
+	}
+	
+	public Product(Product p, String stateProduct, float noteProduct) throws RemoteException {
+		super();
+		this.id = p.getId();
+		this.type = p.getType();
+		this.nameProduct = p.getName();
+		this.price = p.getPrice();
+		this.available = p.isAvailable();
+		this.stateProduct = stateProduct;
+		this.noteProduct = noteProduct;
+		
+		if (price < 0) {
+			throw new IllegalArgumentException("Price can't be negative !");
+		}
+		if (noteProduct < 0) {
+			throw new IllegalArgumentException("note can't be negative !");
 		}
 	}
 	
@@ -64,11 +74,11 @@ public class Product extends UnicastRemoteObject implements IProduct{
 
 	@Override
 	public void setPrice(float price) throws RemoteException {
-		// TODO Auto-generated method stub
 		this.price=price;
 	} 
 
 
+	/*
 	@Override
 	public float getNote() throws RemoteException {
 		return noteProduct;
@@ -88,12 +98,13 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	public void setStat(String statProduct) throws RemoteException {
 		 this.statProduct = this.statProduct + "\n\n" + statProduct;
 	}
+	*/
 
 
 
 	@Override
 	public String toString() {
-		return "Produit [Id : " + id + ", Type : " + type + ", Name of the Product : " + nameProduct + ", Price : " + price + "]";
+		return "Produit [Id : " + id + ", Type : " + type + ", Product name : " + nameProduct + ", Price : " + price + ", Availibility : " + available + "]";
 	}
 
 	@Override
@@ -101,9 +112,9 @@ public class Product extends UnicastRemoteObject implements IProduct{
 		return available;
 	}
 
+	/*
 	@Override
 	public int stock() throws RemoteException {
-		// TODO Auto-generated method stub
 		if(stock !=0) {
 			stock=stock-1;
 		}else {
@@ -111,7 +122,7 @@ public class Product extends UnicastRemoteObject implements IProduct{
 		}
 		return stock;
 	}
-
+*/
 	@Override
 	public void setAvailable(boolean bool) throws RemoteException {
 		available=bool;

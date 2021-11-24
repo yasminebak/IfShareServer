@@ -14,19 +14,19 @@ public interface IProduct extends Remote {
 
 	public void setPrice(float price) throws RemoteException;
 
-	public float getNote() throws RemoteException;
-
-	public void setNote(float noteProduct) throws RemoteException;
-
-	public String getStat() throws RemoteException;
-
-	public void setStat(String statProduct) throws RemoteException;
+//	public float getNote() throws RemoteException;
+//
+//	public void setNote(float noteProduct) throws RemoteException;
+//
+//	public String getStat() throws RemoteException;
+//
+//	public void setStat(String statProduct) throws RemoteException;
 
 	public boolean isAvailable() throws RemoteException;
 	
 	public void setAvailable(boolean bool) throws RemoteException;
 	
-	public int stock() throws RemoteException;
+//	public int stock() throws RemoteException;
 
 	
 }
