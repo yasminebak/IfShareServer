@@ -11,8 +11,8 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	private String type;
 	private String nameProduct;
 	private float price;
-	private String stateProduct=" ";
-	private float noteProduct;
+	private String stateProduct="";
+	private float noteProduct = -1;
 	private boolean available;
 	//private int stock;
 	
@@ -78,7 +78,6 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	} 
 
 
-	/*
 	@Override
 	public float getNote() throws RemoteException {
 		return noteProduct;
@@ -86,20 +85,18 @@ public class Product extends UnicastRemoteObject implements IProduct{
 
 	@Override
 	public void setNote(float noteProduct) throws RemoteException {
-		 this.noteProduct = (this.noteProduct + noteProduct) / 2;
+		 this.noteProduct = noteProduct;
 	}
 
 	@Override
-	public String getStat() throws RemoteException {
-		return statProduct;
+	public String getState() throws RemoteException {
+		return stateProduct;
 	}
 
 	@Override
-	public void setStat(String statProduct) throws RemoteException {
-		 this.statProduct = this.statProduct + "\n\n" + statProduct;
+	public void setState(String stateProduct) throws RemoteException {
+		 this.stateProduct = stateProduct;
 	}
-	*/
-
 
 
 	@Override
