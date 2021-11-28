@@ -1,5 +1,8 @@
+package Server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import Common.IProduct;
 
 public class Product extends UnicastRemoteObject implements IProduct{
 	

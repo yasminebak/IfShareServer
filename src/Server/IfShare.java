@@ -1,3 +1,5 @@
+package Server;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -8,6 +10,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+
+import Common.IEmploye;
+import Common.IIfShare;
+import Common.IProduct;
 
 @SuppressWarnings("serial")
 public class IfShare extends UnicastRemoteObject implements IIfShare {
@@ -66,7 +72,7 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 					LinkedList<IEmploye> value = fifo.get(product);
 					IEmploye employee = value.pollFirst();
 					products.get(id).setAvailable(false);
-					employee.notifyEmployee(id);
+					employee.notifyEmployee(p);
 				}
 			}
 		}

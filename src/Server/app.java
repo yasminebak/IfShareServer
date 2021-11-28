@@ -1,9 +1,13 @@
+package Server;
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.Scanner;
+
+import Common.IIfShare;
+import Common.IProduct;
 
 public class app {
 
