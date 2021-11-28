@@ -13,12 +13,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class IfShare extends UnicastRemoteObject implements IIfShare {
 
 	private Map<String, Product> products;
-	private Map<IProduct, LinkedList<Integer>> fifo;
+	private Map<IProduct, LinkedList<IEmploye>> fifo;
 
 	protected IfShare() throws RemoteException {
 		super();
 		products = new HashMap<String, Product>();
-		fifo = new HashMap<IProduct, LinkedList<Integer>>();
+		fifo = new HashMap<IProduct, LinkedList<IEmploye>>();
 	}
 
 	@Override
@@ -57,6 +57,19 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 		// verify la liste d'attente pour le produit (la list fifo)
 		// si exist ==> notify (1st) employee + enlever de la liste
 		// sinon on fait rien
+		
+		
+		if (!fifo.isEmpty()) {
+			for (Entry<IProduct, LinkedList<IEmploye>> e1 : fifo.entrySet()) {
+				IProduct product = e1.getKey();
+				if (product.getName().equals(nameProduct) && product.getType().equals(type)) {
+					LinkedList<IEmploye> value = fifo.get(product);
+					IEmploye employee = value.pollFirst();
+					products.get(id).setAvailable(false);
+					employee.notifyEmployee(id);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -124,7 +137,7 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	}
 
 	@Override
-	public String buyProduct(String type, String nameProduct, int id) throws RemoteException {
+	public String buyProduct(String type, String nameProduct, IEmploye employee) throws RemoteException {
 		
 		if (type == null || nameProduct == null) {
 			return null;
@@ -138,32 +151,37 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 				if (p.isAvailable()) {
 					p.setAvailable(false);
 					return p.getId();			
-				} else {
-					if (fifo.containsKey(p)) {
-						if (!fifo.get(p).contains(id)) {
-							fifo.get(p).add(id);
-							response = "Sorry, this product is not available, you will be notified when it will be available again!";
-						} else {
-							response = "You have an order in progress !";
-						}
-					} else {
-						LinkedList<Integer> idList = new LinkedList<>();
-						idList.add(id);
-						fifo.put(p, idList);
-						response = "Sorry, this product is not available, you will be notified when it will be available again!";
-					}
-				}
+				} 
 			} else {
 				response = "This product doesn't exist";
 			}
 		}
+		
+		for(Entry<String, Product> e : products.entrySet()) {
+			Product p =e.getValue();
+			if(p.getType().equals(type) && p.getName().equals(nameProduct)) {
+				if (fifo.containsKey(p)) {
+					if (!fifo.get(p).contains(employee)) {
+						fifo.get(p).add(employee);
+						return "Sorry, this product is not available, you will be notified when it will be available again!";
+					} else {
+						return "You have an order in progress !";
+					}
+				} else {
+					LinkedList<IEmploye> employeeList = new LinkedList<>();
+					employeeList.add(employee);
+					fifo.put(p, employeeList);
+					return "Sorry, this product is not available, you will be notified when it will be available again!";
+				}
+			}
+		}
+		
 		return response;	
 	}
 
-	// TODO
-	// cancelProduct()
-	// si un employé notifié decide qu'il veut plus acheter le produit
-	// on prend le prochain dans la liste fifo et on le notifie
-	
+	@Override
+	public void setFifo() throws RemoteException {
+		fifo = new HashMap<IProduct, LinkedList<IEmploye>>();
+	}	
 	
 }

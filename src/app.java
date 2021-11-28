@@ -3,6 +3,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
+import java.util.Scanner;
 
 public class app {
 
@@ -39,6 +40,14 @@ public class app {
 			System.setProperty("java.rmi.server.hostname", ip);
 			r.rebind("//" + ip + "/IFShareService", service);
 			System.out.println("Server is Up and Running");
+			System.out.println("///////////////////////////////");
+			Scanner scanner = new Scanner(System.in);
+			String type = scanner.nextLine();
+			scanner = new Scanner(System.in);
+			String name = scanner.nextLine();
+			scanner = new Scanner(System.in);
+			float price = scanner.nextFloat();
+			service.addProduct(type, name, price);
 		} catch (Exception e) {
 			System.out.println("Trouble: " + e);
 		}
