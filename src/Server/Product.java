@@ -17,15 +17,16 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	private String stateProduct="";
 	private float noteProduct = -1;
 	private boolean available;
-	//private int stock;
+	private boolean isSold;
 	
-	public Product(String id, String type, String nameProduct, float price, boolean availible) throws RemoteException {
+	public Product(String id, String type, String nameProduct, float price) throws RemoteException {
 		super();
 		this.id = id;
 		this.type = type;
 		this.nameProduct = nameProduct;
 		this.price = price;
-		this.available = availible;
+		this.available = true;
+		this.isSold = false;
 		
 		if (price < 0) {
 			throw new IllegalArgumentException("Price can't be negative !");
@@ -100,11 +101,21 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	public void setState(String stateProduct) throws RemoteException {
 		 this.stateProduct = stateProduct;
 	}
+	
+	@Override
+	public boolean getIsSold() throws RemoteException {
+		return this.isSold;
+	}
+
+	@Override
+	public void setIsSold(boolean isSold) throws RemoteException {
+		this.isSold = isSold;
+	}
 
 
 	@Override
 	public String toString() {
-		return "Produit [Id : " + id + ", Type : " + type + ", Product name : " + nameProduct + ", Price : " + price + ", Availibility : " + available + "]";
+		return "Produit [Id : " + id + ", Type : " + type + ", Product name : " + nameProduct + ", Price : " + price + ", Availibility : " + available + ", isSold : " + isSold + "]";
 	}
 
 	@Override
@@ -127,10 +138,6 @@ public class Product extends UnicastRemoteObject implements IProduct{
 	public void setAvailable(boolean bool) throws RemoteException {
 		available=bool;
 	}
-
-	
-
-	
 
 	
 }

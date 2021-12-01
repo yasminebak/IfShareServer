@@ -18,12 +18,12 @@ import Common.IProduct;
 @SuppressWarnings("serial")
 public class IfShare extends UnicastRemoteObject implements IIfShare {
 
-	private Map<String, Product> products;
+	private Map<String, IProduct> products;
 	private Map<IProduct, LinkedList<IEmploye>> fifo;
 
 	protected IfShare() throws RemoteException {
 		super();
-		products = new HashMap<String, Product>();
+		products = new HashMap<String, IProduct>();
 		fifo = new HashMap<IProduct, LinkedList<IEmploye>>();
 	}
 
@@ -46,8 +46,7 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 			throw new IllegalArgumentException("Price can't be negative !");
 		}
 
-		// generate ID
-		// 2 premier lettre type + 2 premiere lettre nameProduct + chiffre
+		// generate ID: 2 premier lettre type + 2 premiere lettre nameProduct + chiffre
 		if (type.length() < 2 && nameProduct.length() < 2) {
 			throw new IllegalArgumentException("Product type or name can't be null or short !");
 		}
@@ -57,25 +56,16 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 			id = type.substring(0, 2) + nameProduct.substring(0, 2) + randomNum;
 		} while (getAllProduct().contains(id));
 
-		Product p = new Product(id, type, nameProduct, price, true);
-		products.put(id, p);
-
-		// verify la liste d'attente pour le produit (la list fifo)
-		// si exist ==> notify (1st) employee + enlever de la liste
-		// sinon on fait rien
+		Product p = new Product(id, type, nameProduct, price);
 		
-		
-		if (!fifo.isEmpty()) {
-			for (Entry<IProduct, LinkedList<IEmploye>> e1 : fifo.entrySet()) {
-				IProduct product = e1.getKey();
-				if (product.getName().equals(nameProduct) && product.getType().equals(type)) {
-					LinkedList<IEmploye> value = fifo.get(product);
-					IEmploye employee = value.pollFirst();
-					products.get(id).setAvailable(false);
-					employee.notifyEmployee(p);
-				}
+		// set the value of isSold as the one of the same category (type + name)
+		for (Entry<String, IProduct> p1 : products.entrySet()) {
+			IProduct product = p1.getValue();
+			if (product.getName().equals(nameProduct) && product.getType().equals(type)) {
+				p.setIsSold(product.getIsSold());
 			}
 		}
+		products.put(id, p);
 	}
 
 	@Override
@@ -84,14 +74,13 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 		if (products.containsKey(id)) {
 			products.remove(id);
 		}
-
 	}
 
 	@Override
 	public List<IProduct> lookProductType(String type) throws RemoteException {
 		List<IProduct> returnProduct = new ArrayList<IProduct>();
-		for (HashMap.Entry<String, Product> e : products.entrySet()) {
-			Product p = e.getValue();
+		for (HashMap.Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p = e.getValue();
 			if (p.getType().equals(type)) {
 				returnProduct.add(p);
 			}
@@ -102,8 +91,8 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	@Override
 	public List<IProduct> lookProductTypeName(String type, String nameProduct) throws RemoteException {
 		List<IProduct> returnProduct = new ArrayList<IProduct>();
-		for (Entry<String, Product> e : products.entrySet()) {
-			Product p = e.getValue();
+		for (Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p = e.getValue();
 			if (p.getType().equals(type) && p.getName().equals(nameProduct)) {
 				returnProduct.add(p);
 			}
@@ -122,9 +111,9 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	public List<IProduct> getAllProduct() throws RemoteException {
 		List<IProduct> returnProduct = new ArrayList<>();
 		// entryset renvoie des couples clé valeur
-		for (HashMap.Entry<String, Product> e : products.entrySet()) {
+		for (HashMap.Entry<String, IProduct> e : products.entrySet()) {
 			// e contient les couples clé valeur des produits
-			Product p = e.getValue();
+			IProduct p = e.getValue();
 			returnProduct.add(p);
 		}
 		return returnProduct;
@@ -133,8 +122,8 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	@Override
 	public List<IProduct> getAvailableProduct() throws RemoteException {
 		List<IProduct> returnProduct = new ArrayList<IProduct>();
-		for (Entry<String, Product> e : products.entrySet()) {
-			Product p = e.getValue();
+		for (Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p = e.getValue();
 			if (p.isAvailable()) {
 				returnProduct.add(p);
 			}
@@ -143,29 +132,28 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	}
 
 	@Override
-	public String buyProduct(String type, String nameProduct, IEmploye employee) throws RemoteException {
+	public String buyProduct(String id, IEmploye employee) throws RemoteException {
 		
-		if (type == null || nameProduct == null) {
+		if (id == null) {
 			return null;
 		}
 		
 		String response = "";
 		
-		for(Entry<String, Product> e : products.entrySet()) {
-			Product p =e.getValue();
-			if(p.getType().equals(type) && p.getName().equals(nameProduct)) {
-				if (p.isAvailable()) {
-					p.setAvailable(false);
-					return p.getId();			
-				} 
-			} else {
-				response = "This product doesn't exist";
-			}
+		if (products.containsKey(id)) {
+			IProduct p = products.get(id);
+			if (p.isAvailable()) {
+				p.setIsSold(true);
+				p.setAvailable(false);
+				return id;			
+			} 
+		} else {
+			response = "This product doesn't exist";
 		}
 		
-		for(Entry<String, Product> e : products.entrySet()) {
-			Product p =e.getValue();
-			if(p.getType().equals(type) && p.getName().equals(nameProduct)) {
+		for(Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p =e.getValue();
+			if(p.getId().equals(id)) {
 				if (fifo.containsKey(p)) {
 					if (!fifo.get(p).contains(employee)) {
 						fifo.get(p).add(employee);
@@ -188,6 +176,38 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 	@Override
 	public void setFifo() throws RemoteException {
 		fifo = new HashMap<IProduct, LinkedList<IEmploye>>();
-	}	
-	
+	}
+
+	@Override
+	public IProduct sellProduct(String id, float note, String state, float price) throws RemoteException {
+		IProduct prod = null;
+		boolean isSold = false;
+		for(Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p = e.getValue();
+			if(p.getId().equals(id)) {
+				prod = p;
+				p.setNote(note);
+				p.setState(state);
+				p.setPrice(price);
+				p.setAvailable(true);
+				isSold = true;
+			}
+		}
+		
+		if (!fifo.isEmpty() && isSold) {
+			for (Entry<IProduct, LinkedList<IEmploye>> e1 : fifo.entrySet()) {
+				IProduct product = e1.getKey();
+				LinkedList<IEmploye> listEmp = e1.getValue();
+				if (!listEmp.isEmpty()) {
+					if (product.getId().equals(id)) {
+						LinkedList<IEmploye> value = fifo.get(product);
+						IEmploye employee = value.pollFirst();
+						prod.setAvailable(false);
+						employee.notifyEmployee(product);
+					}
+				}
+			}
+		}
+		return prod;
+	}
 }

@@ -16,8 +16,6 @@ public class app {
 	public static void main(String[] args) throws RemoteException {
 		//IProduct product = new Product();
 		IIfShare service = new IfShare();
-		
-		IIfShare ifshare = new IfShare();
 		service.addProduct("vetement", "pull", 10.5f);
 		service.addProduct("vetement", "pantalon", 20.5f);
 		service.addProduct("vetement", "pull", 10);
@@ -29,8 +27,7 @@ public class app {
 		}
 		
 		try {
-			
-					
+				
 			String ip = Inet4Address.getLocalHost().getHostAddress();
 			if (ip == null || ip == "") {
 				ip = "localhost";
@@ -44,14 +41,6 @@ public class app {
 			System.setProperty("java.rmi.server.hostname", ip);
 			r.rebind("//" + ip + "/IFShareService", service);
 			System.out.println("Server is Up and Running");
-			System.out.println("///////////////////////////////");
-			Scanner scanner = new Scanner(System.in);
-			String type = scanner.nextLine();
-			scanner = new Scanner(System.in);
-			String name = scanner.nextLine();
-			scanner = new Scanner(System.in);
-			float price = scanner.nextFloat();
-			service.addProduct(type, name, price);
 		} catch (Exception e) {
 			System.out.println("Trouble: " + e);
 		}
