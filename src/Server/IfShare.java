@@ -118,6 +118,19 @@ public class IfShare extends UnicastRemoteObject implements IIfShare {
 		}
 		return returnProduct;
 	}
+	
+	@Override
+	public List<IProduct> getSoldProduct() throws RemoteException {
+		List<IProduct> returnProduct = new ArrayList<>();
+		// entryset renvoie des couples clé valeur
+		for (HashMap.Entry<String, IProduct> e : products.entrySet()) {
+			IProduct p = e.getValue();
+			if (p.getIsSold() == true) {
+				returnProduct.add(p);
+			}
+		}
+		return returnProduct;
+	}
 
 	@Override
 	public List<IProduct> getAvailableProduct() throws RemoteException {
